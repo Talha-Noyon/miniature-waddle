@@ -33,10 +33,7 @@ router.post("/signUp", function(req, res) {
 			} else {
 				console.log("1 record inserted", result.insertId)
 				params.id = result.insertId
-				con.query("UPDATE users SET ? WHERE u_id = " + result.insertId, {type: 1}, function(err, result) {
-					console.log(err.sqlMessage)
-					res.status(500).json({ msg: err.sqlMessage })
-				})
+
 				res.status(200).json({ newUser: params })
 			}
 		})
