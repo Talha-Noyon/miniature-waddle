@@ -356,7 +356,7 @@ router.get("/orders/all", verifyToken, function (req, res) {
     @Params: {status,chefs_token} login check
     @Response: {updatedStatus: {}}
 */
-router.put("/order/custom/status/:id", function (req, res) {
+router.put("/order/custom/status/:id", verifyToken, function (req, res) {
     let id = req.params.id
     let params = req.body
     let error = {}
