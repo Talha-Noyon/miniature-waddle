@@ -8,7 +8,6 @@ var fileUpload = require('express-fileupload')
 var indexRoute = require("./routes/index")
 var userRoute = require("./routes/user")
 var chefRoute = require("./routes/chef")
-
 var app = express()
 var mysql = require("mysql")
 
