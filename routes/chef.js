@@ -113,9 +113,11 @@ router.post("/signIn", function (req, res) {
 })
 
 
+
+
 /*
 	@POST /chef/food
-	@Params: {f_name*, f_details*, f_price*,token, deliveryTime, imagePath}
+	@Params: {f_name*, f_details*, f_price*, deliveryTime, imagePath}
 	@Response: {newFood: []}
 */
 router.post("/food", verifyToken, function (req, res) {
@@ -270,7 +272,7 @@ router.get("/orders/custom/all", verifyToken, function (req, res) {
 
 
 /*
-    @GET /chef/order/status/:id
+    @PUT /chef/order/status/:id
     @Params: {status} login check
     @Response: {changeStatus: {}}
 */
@@ -309,7 +311,7 @@ router.put("/order/status/:id", verifyToken, function (req, res) {
 })
 
 /*
-    @POST /chef/orders/all
+    @GET /chef/orders/all
     @Params: {chefs_token} login check
     @Response: {allOrders: {}}
 */
@@ -352,7 +354,7 @@ router.get("/orders/all", verifyToken, function (req, res) {
 
 
 /*
-    @GET /chef/order/custom/status/:id
+    @PUT /chef/order/custom/status/:id
     @Params: {status,chefs_token} login check
     @Response: {updatedStatus: {}}
 */
@@ -404,7 +406,7 @@ router.get("/getPendingOrders", verifyToken, function (req, res) {
             res.status(403).json({error: err, "msg": "user expired token not found"});
         } else {
 
-            let sql = "SELECT * FROM orders Where o_chef_status =1"
+            let sql = "SELECT f_name,f_details,f_imagePath,f_delivery_time,u_name,u_email FROM orders left join foods on orders.f_id=foods.f_id left join users on users.u_id=orders.u_id Where o_chef_status =1"
             // console.log(checks)
 
             con.query(sql, function (err, result) {
@@ -426,7 +428,7 @@ router.get("/getPendingOrders", verifyToken, function (req, res) {
 
 
 /*
-    @GET /chef/order/makeDelivery/:id
+    @PUT /chef/order/makeDelivery/:id
     @Params: {status,chefs_token} login check
     @Response: {orderDetails: {}}
 */
@@ -481,20 +483,31 @@ router.put("/order/makeDelivery/:id", function (req, res) {
     @Params: {} login check
     @Response: {notification: {}}
 */
-router.get("/getNotification", function (req, res) {
-    let sql = "SELECT foods.name as food_name,users.u_name as user_name FROM reviews left join foods on reviews.foods_id=foods.id left join users on reviews.users_id= users.u_id "
-    // console.log(checks)
+router.get("/getNotification",verifyToken, function (req, res) {
 
-    con.query(sql, function (err, result) {
+    jwt.verify(req.token, 'secretkey', (err, authData) => {
+        //console.log(req)
         if (err) {
-            // console.log(err.sqlMessage)
-            res.status(500).json({msg: err.sqlMessage})
-        } else {
-            console.log("@result", result)
-            if (result.length) res.status(200).json({notification: result})
-            else res.status(404).json({msg: "No notification has found"})
+            res.status(403).json({error: err, "msg": "user expired token not found"});
+        }else {
+
+            let sql = "SELECT foods.name as food_name,users.u_name as user_name FROM reviews left join foods on reviews.foods_id=foods.id left join users on reviews.users_id= users.u_id "
+            // console.log(checks)
+
+            con.query(sql, function (err, result) {
+                if (err) {
+                    // console.log(err.sqlMessage)
+                    res.status(500).json({msg: err.sqlMessage})
+                } else {
+                    console.log("@result", result)
+                    if (result.length) res.status(200).json({notification: result})
+                    else res.status(404).json({msg: "No notification has found"})
+                }
+            })
+
         }
     })
+
 })
 
 
